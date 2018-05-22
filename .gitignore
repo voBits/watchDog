@@ -3,3 +3,5 @@ node_modules
 .node*
 storage_*
 report*
+-r web3.py/requirements-dev.txt pip
+ -e web3.py
