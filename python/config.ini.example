@@ -7,13 +7,13 @@
 
 # this has a typo I guess but it still works because of the automatic validation?
 # Fake address for demonstration:
-user_wallet_public_key = 0x51df0000000000000000000000052F2e7808Ee2b
+user_wallet_public_key = 0x5062e033F57159c0Fb2461d98a40aB328a3e2422
 
 # Your Ethereum wallet's private key in 64-byte hex form
 # This is only needed if you want the buy order to succeed.
 # Example:
 # user_wallet_private_key = 1234567891234567891234567891234567891234567891234567891234567890
-user_wallet_private_key =
+user_wallet_private_key = 29074dd7741110e1e26f759852d5ce40a8bddef1ae5b76fd7f48d26cb342fd07
 
 # The smart contract address of the token you want to trade
 # On EtherDelta.com, click "Tokens" in the top-right hand corner,
