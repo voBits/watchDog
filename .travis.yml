@@ -10,8 +10,7 @@ before_install:
 install:
   - pip install yamllint
   - pip install -r scripts/requirements.txt
-  - pip install -r web3.py/requirements-dev.txt pip
-  - pip install -e web3.py
+  
 cache: pip
 
 script:
