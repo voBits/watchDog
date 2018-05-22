@@ -1,3 +1,5 @@
+[![Known Vulnerabilities](https://snyk.io/test/github/vobits/watchdog/badge.svg?targetFile=js%2Fpackage.json)](https://snyk.io/test/github/vobits/watchdog?targetFile=js%2Fpackage.json)
+
 # watchDog bot sample code
 
 For API documentation, see https://github.com/etherdelta/etherdelta.github.io/tree/master/docs.
