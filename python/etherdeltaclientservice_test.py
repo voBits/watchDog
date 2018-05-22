@@ -5,13 +5,13 @@ from etherdeltaclientservice import *
 __version__ = "1.0"
 
 # Fake userAccount
-userAccount = '0x51df0000000000000000000000052F2e7808Ee2b'
+userAccount = '0x5062e033F57159c0Fb2461d98a40aB328a3e2422'
 # Fake private key
-private_key = '1234567891234567891234567891234567891234567891234567891234567890'
+private_key = '29074dd7741110e1e26f759852d5ce40a8bddef1ae5b76fd7f48d26cb342fd07'
 # Real EtherDelta Contract Address
 etherDeltaContractAddr = '0x8d12A197cB00D4747a1fe03395095ce2A5CC6819'
 # Real GRX token
-token = '0x219218f117dc9348b358b8471c55a073e5e0da0b'
+token = '0xc7d150214856f42fb6d4111f7c88fb4456313b8a'
 
 # Orders
 # These are from the buy side of the order book because they have tokenGet so they are buying token and giving ETH for it
