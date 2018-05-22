@@ -16,6 +16,7 @@ script:
   - git diff --name-only $TRAVIS_COMMIT_RANGE | grep tokens/
   - git diff --name-only $TRAVIS_COMMIT_RANGE | grep tokens/ | xargs python scripts/test.py
   - git diff --name-only $TRAVIS_COMMIT_RANGE | grep tokens/ | xargs yamllint -c .yamllint
+  
   sudo: required
 language: python
 dist: trusty
