@@ -37,13 +37,13 @@ function Service() {
     }, 10000);
   });
 
-  self.getMarket = (token, base, user) => {
+  self.getMarket = (token, user) => {
     if (!token || !self.web3.isAddress(token.addr)) throw new Error('Please enter a valid token');
     if (!user || !self.web3.isAddress(user.addr)) throw new Error('Please enter a valid address');
-    self.socket.emit('getMarket', { token: token.addr, base: base.addr, user: user.addr });
+    self.socket.emit('getMarket', { token: token.addr, user: user.addr });
   };
 
-  self.waitForMarket = (token, base, user) => new Promise((resolve, reject) => {
+  self.waitForMarket = (token, user) => new Promise((resolve, reject) => {
     setTimeout(() => {
       reject('Could not get market');
     }, 20000);
@@ -56,16 +56,16 @@ function Service() {
     self.socket.off('orders');
     self.socket.off('trades');
     const getMarketAndWait = () => {
-      self.getMarket(token, base, user);
+      self.getMarket(token, user);
       self.socket.once('market', (market) => {
         if ((market.myTrades || !user.addr) && (market.orders && market.trades)) {
-          self.updateOrders(market.orders, token, base, user);
-          self.updateTrades(market.trades, token, base, user);
+          self.updateOrders(market.orders, token, user);
+          self.updateTrades(market.trades, token, user);
           self.socket.on('orders', (orders) => {
-            self.updateOrders(orders, token, base, user);
+            self.updateOrders(orders, token, user);
           });
           self.socket.on('trades', (trades) => {
-            self.updateTrades(trades, token, base, user);
+            self.updateTrades(trades, token, user);
           });
           resolve();
         } else {
@@ -78,12 +78,11 @@ function Service() {
     getMarketAndWait();
   });
 
-  self.updateOrders = (newOrders, token, base, user) => {
+  self.updateOrders = (newOrders, token, user) => {
     const minOrderSize = 0.001;
     const newOrdersTransformed = {
       buys: newOrders.buys
-        .filter(x => x.tokenGet.toLowerCase() === token.addr.toLowerCase() &&
-          x.tokenGive.toLowerCase() === base.addr.toLowerCase())
+        .filter(x => x.tokenGet.toLowerCase() === token.addr.toLowerCase())
         .map(x =>
         Object.assign({}, {
           id: x.id,
@@ -101,15 +100,14 @@ function Service() {
           s: x.s,
           v: x.v ? Number(x.v) : undefined,
           amount: self.toEth(x.amountGet, token.decimals).toNumber(),
-          amountBase: self.toEth(x.amountGive, base.decimals).toNumber(),
+          amountBase: self.toEth(x.amountGive, 18).toNumber(),
           availableVolume: Number(x.availableVolume),
           ethAvailableVolume: Number(x.ethAvailableVolume),
           availableVolumeBase: Number(x.availableVolumeBase),
           ethAvailableVolumeBase: Number(x.ethAvailableVolumeBase),
         })),
       sells: newOrders.sells
-      .filter(x => x.tokenGive.toLowerCase() === token.addr.toLowerCase() &&
-        x.tokenGet.toLowerCase() === base.addr.toLowerCase())
+      .filter(x => x.tokenGive.toLowerCase() === token.addr.toLowerCase())
       .map(x =>
         Object.assign({}, {
           id: x.id,
@@ -127,7 +125,7 @@ function Service() {
           s: x.s,
           v: x.v ? Number(x.v) : undefined,
           amount: self.toEth(x.amountGive, token.decimals).toNumber(),
-          amountBase: self.toEth(x.amountGet, base.decimals).toNumber(),
+          amountBase: self.toEth(x.amountGet, 18).toNumber(),
           availableVolume: Number(x.availableVolume),
           ethAvailableVolume: Number(x.ethAvailableVolume),
           availableVolumeBase: Number(x.availableVolumeBase),
@@ -186,13 +184,9 @@ function Service() {
     };
   };
 
-  self.updateTrades = (newTrades, token, base, user) => {
-    console.log(newTrades[0])
+  self.updateTrades = (newTrades, token, user) => {
     const newTradesTransformed = newTrades
-    .filter(x => (x.tokenGiveAddr.toLowerCase() === token.addr.toLowerCase() &&
-      x.tokenGetAddr.toLowerCase() === base.addr.toLowerCase()) ||
-      (x.tokenGiveAddr.toLowerCase() === base.addr.toLowerCase() &&
-      x.tokenGetAddr.toLowerCase() === token.addr.toLowerCase()))
+    .filter(x => !x.tokenAddr || x.tokenAddr.toLowerCase() === token.addr.toLowerCase())
     .map(x =>
       Object.assign(x, {
         txHash: x.txHash,
@@ -256,7 +250,7 @@ function Service() {
   });
 
   self.getBalance = (token, user) => new Promise((resolve, reject) => {
-    if (token === 'ETH' || token.addr === '0x0000000000000000000000000000000000000000') {
+    if (token === 'ETH') {
       self.web3.eth.getBalance(user.addr, (err, result) => {
         if (err) reject(err);
         resolve(result);
@@ -481,14 +475,14 @@ function Service() {
     const amountBigNum = new BigNumber(String(amount));
     const amountBaseBigNum = new BigNumber(String(amount * price));
     const contractAddr = self.config.addressEtherDelta;
-    const tokenGet = side === 'buy' ? token.addr : base.addr;
-    const tokenGive = side === 'sell' ? token.addr : base.addr;
+    const tokenGet = side === 'buy' ? token.addr : '0x0000000000000000000000000000000000000000';
+    const tokenGive = side === 'sell' ? token.addr : '0x0000000000000000000000000000000000000000';
     const amountGet = side === 'buy' ?
       self.toWei(amountBigNum, token.decimals) :
-      self.toWei(amountBaseBigNum, base.decimals);
+      self.toWei(amountBaseBigNum, 18);
     const amountGive = side === 'sell' ?
       self.toWei(amountBigNum, token.decimals) :
-      self.toWei(amountBaseBigNum, base.decimals);
+      self.toWei(amountBaseBigNum, 18);
     const orderNonce = Number(Math.random().toString().slice(2));
 
     const unpacked = [

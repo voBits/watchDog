@@ -5,13 +5,8 @@ const token = {
   decimals: 18,
 };
 
-const base = {
-  addr: '0x0000000000000000000000000000000000000000', // ETH
-  decimals: 18,
-};
-
 const user = {
-  addr: '0xcdb1978195f0f6694d0fc4c5770660f12aad65c3',
+  addr: '',
   pk: '',
 };
 
@@ -25,14 +20,14 @@ const config = {
 
 const service = new Service();
 service.init(config)
-.then(() => service.waitForMarket(token, base, user))
+.then(() => service.waitForMarket(token, user))
 .then(() => {
   service.printOrderBook();
   service.printTrades();
   return Promise.all([
-    service.getBalance(base, user),
+    service.getBalance('ETH', user),
     service.getBalance(token, user),
-    service.getEtherDeltaBalance(base, user),
+    service.getEtherDeltaBalance('ETH', user),
     service.getEtherDeltaBalance(token, user),
   ]);
 })
